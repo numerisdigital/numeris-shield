@@ -1,0 +1,115 @@
+.ns-wrap {
+	max-width: 900px;
+}
+
+.ns-header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 20px 0 16px;
+}
+.ns-header-icon {
+	font-size: 28px;
+	width: 28px;
+	height: 28px;
+	color: #d63638;
+}
+.ns-header h1 {
+	margin: 0;
+	padding: 0;
+}
+
+.ns-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	border-bottom: 1px solid #dcdcde;
+	margin-bottom: 20px;
+}
+.ns-tab {
+	display: inline-block;
+	padding: 10px 14px;
+	font-weight: 500;
+	text-decoration: none;
+	color: #50575e;
+	border: 1px solid transparent;
+	border-bottom: none;
+	border-radius: 4px 4px 0 0;
+	margin-bottom: -1px;
+}
+.ns-tab:hover {
+	color: #1d2327;
+	background: #f0f0f1;
+}
+.ns-tab.is-active {
+	color: #1d2327;
+	background: #fff;
+	border-color: #dcdcde;
+	font-weight: 600;
+}
+
+.ns-tab-panel[hidden] {
+	display: none;
+}
+
+.ns-card {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	padding: 20px 24px;
+	margin-bottom: 20px;
+}
+
+.ns-intro {
+	color: #50575e;
+	font-size: 13px;
+	margin: 0 0 16px;
+	padding-bottom: 16px;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+/* Toggle switch, built from a plain checkbox for accessibility (real
+   checkbox semantics, just visually restyled) */
+.ns-toggle {
+	position: relative;
+	display: inline-block;
+	width: 40px;
+	height: 22px;
+	cursor: pointer;
+}
+.ns-toggle input {
+	position: absolute;
+	opacity: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	cursor: pointer;
+}
+.ns-track {
+	position: absolute;
+	inset: 0;
+	background: #c3c4c7;
+	border-radius: 999px;
+	transition: background 0.15s ease;
+}
+.ns-thumb {
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 18px;
+	height: 18px;
+	background: #fff;
+	border-radius: 50%;
+	transition: transform 0.15s ease;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+.ns-toggle input:checked ~ .ns-track {
+	background: #2271b1;
+}
+.ns-toggle input:checked ~ .ns-track .ns-thumb {
+	transform: translateX(18px);
+}
+.ns-toggle input:focus-visible ~ .ns-track {
+	outline: 2px solid #2271b1;
+	outline-offset: 2px;
+}
