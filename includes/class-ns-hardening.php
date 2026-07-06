@@ -117,6 +117,15 @@ class NS_Hardening {
 		add_filter( 'the_generator', '__return_empty_string' );
 
 		$strip_version = function ( $src ) {
+			// Only touch URLs that actually carry our ver=X.Y.Z query var.
+			// Running every enqueued src through remove_query_arg() -
+			// even third-party URLs like Google Fonts that repeat the
+			// same query key (family=...&family=...&family=...) - round-trips
+			// through parse_str(), which silently collapses repeated keys
+			// down to the last one and corrupts the URL.
+			if ( ! str_contains( $src, 'ver=' ) ) {
+				return $src;
+			}
 			return remove_query_arg( 'ver', $src );
 		};
 		add_filter( 'style_loader_src', $strip_version );
