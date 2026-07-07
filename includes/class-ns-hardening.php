@@ -116,20 +116,43 @@ class NS_Hardening {
 		remove_action( 'wp_head', 'wp_generator' );
 		add_filter( 'the_generator', '__return_empty_string' );
 
-		$strip_version = function ( $src ) {
-			// Only touch URLs that actually carry our ver=X.Y.Z query var.
-			// Running every enqueued src through remove_query_arg() -
-			// even third-party URLs like Google Fonts that repeat the
-			// same query key (family=...&family=...&family=...) - round-trips
-			// through parse_str(), which silently collapses repeated keys
-			// down to the last one and corrupts the URL.
-			if ( ! str_contains( $src, 'ver=' ) ) {
-				return $src;
-			}
-			return remove_query_arg( 'ver', $src );
-		};
-		add_filter( 'style_loader_src', $strip_version );
-		add_filter( 'script_loader_src', $strip_version );
+		add_filter( 'style_loader_src', array( $this, 'strip_ver_query_arg' ) );
+		add_filter( 'script_loader_src', array( $this, 'strip_ver_query_arg' ) );
+	}
+
+	/**
+	 * Removes only the "ver" query parameter from an enqueued asset URL,
+	 * without going through WordPress's remove_query_arg(). That helper
+	 * round-trips the query string through parse_str(), which silently
+	 * collapses repeated query keys down to the last occurrence — and
+	 * third-party URLs this filter also sees (e.g. Google Fonts's
+	 * family=A&family=B) rely on repeating a key on purpose. Operating on
+	 * the raw "key=value" pairs instead leaves every other pair, including
+	 * duplicates, untouched.
+	 */
+	public function strip_ver_query_arg( $src ) {
+		$query_pos = strpos( $src, '?' );
+		if ( false === $query_pos ) {
+			return $src;
+		}
+
+		$base  = substr( $src, 0, $query_pos );
+		$query = substr( $src, $query_pos + 1 );
+
+		$fragment = '';
+		$hash_pos = strpos( $query, '#' );
+		if ( false !== $hash_pos ) {
+			$fragment = substr( $query, $hash_pos );
+			$query    = substr( $query, 0, $hash_pos );
+		}
+
+		$pairs = array_filter( explode( '&', $query ), function ( $pair ) {
+			return '' !== $pair && 'ver' !== $pair && 0 !== strpos( $pair, 'ver=' );
+		} );
+
+		$query = implode( '&', $pairs );
+
+		return $base . ( '' !== $query ? '?' . $query : '' ) . $fragment;
 	}
 
 	/**
