@@ -37,6 +37,7 @@ class NS_Plugin {
 		new NS_Hardening();
 		new NS_Activity_Log();
 		new NS_Environment_Indicator();
+		new NS_GitHub_Updater();
 
 		if ( is_admin() ) {
 			new NS_Admin_Page();
