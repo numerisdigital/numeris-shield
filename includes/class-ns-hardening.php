@@ -121,14 +121,20 @@ class NS_Hardening {
 	}
 
 	/**
-	 * Removes only the "ver" query parameter from an enqueued asset URL,
-	 * without going through WordPress's remove_query_arg(). That helper
-	 * round-trips the query string through parse_str(), which silently
-	 * collapses repeated query keys down to the last occurrence — and
-	 * third-party URLs this filter also sees (e.g. Google Fonts's
-	 * family=A&family=B) rely on repeating a key on purpose. Operating on
-	 * the raw "key=value" pairs instead leaves every other pair, including
-	 * duplicates, untouched.
+	 * Removes only a "ver" query parameter whose value is literally
+	 * WordPress's own core version — that's the one thing this feature is
+	 * meant to hide. A theme or plugin's own cache-busting version (e.g. a
+	 * filemtime()-based value, so a CSS/JS edit is picked up immediately
+	 * instead of serving a stale cached copy) isn't a version-disclosure
+	 * leak, and stripping it too would silently defeat that cache-busting
+	 * on every asset on the site.
+	 *
+	 * Doesn't go through WordPress's remove_query_arg(), which round-trips
+	 * the query string through parse_str() — that silently collapses
+	 * repeated query keys down to the last occurrence, and third-party URLs
+	 * this filter also sees (e.g. Google Fonts's family=A&family=B) rely on
+	 * repeating a key on purpose. Operating on the raw "key=value" pairs
+	 * instead leaves every other pair, including duplicates, untouched.
 	 */
 	public function strip_ver_query_arg( $src ) {
 		$query_pos = strpos( $src, '?' );
@@ -146,8 +152,10 @@ class NS_Hardening {
 			$query    = substr( $query, 0, $hash_pos );
 		}
 
-		$pairs = array_filter( explode( '&', $query ), function ( $pair ) {
-			return '' !== $pair && 'ver' !== $pair && 0 !== strpos( $pair, 'ver=' );
+		$wp_version_pair = 'ver=' . get_bloginfo( 'version' );
+
+		$pairs = array_filter( explode( '&', $query ), function ( $pair ) use ( $wp_version_pair ) {
+			return $pair !== $wp_version_pair;
 		} );
 
 		$query = implode( '&', $pairs );
