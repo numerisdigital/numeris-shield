@@ -1,7 +1,6 @@
 <?php
 /**
  * Plugin Name:       Numeris Shield
- * Plugin URI:        https://numeris.digital
  * Description:       Login hardening, brute-force protection, two-factor authentication, core hardening and activity logging for WordPress — built for reuse across Numeris Digital client sites.
  * Version:           1.1.2
  * Requires at least: 6.0
