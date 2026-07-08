@@ -8,11 +8,15 @@
 	gap: 10px;
 	margin: 20px 0 16px;
 }
-.ns-header-icon {
-	font-size: 28px;
-	width: 28px;
-	height: 28px;
-	color: #d63638;
+.ns-header-logo {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	background: #d63638;
+	border-radius: 8px;
+	flex-shrink: 0;
 }
 .ns-header h1 {
 	margin: 0;

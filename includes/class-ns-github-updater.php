@@ -20,7 +20,7 @@ class NS_GitHub_Updater {
 		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_update' ) );
 		add_filter( 'plugins_api', array( $this, 'plugin_info' ), 20, 3 );
 		add_filter( 'upgrader_source_selection', array( $this, 'fix_source_folder_name' ), 10, 4 );
-		add_action( 'upgrader_process_complete', array( $this, 'purge_cache' ), 10, 2 );
+		add_action( 'upgrader_process_complete', array( $this, 'purge_cache_after_update' ), 10, 2 );
 		add_action( 'delete_site_transient_update_plugins', array( $this, 'purge_cache' ) );
 	}
 
@@ -167,14 +167,28 @@ class NS_GitHub_Updater {
 	}
 
 	/**
-	 * Drops the cached release data once an update actually runs (whether
-	 * ours or another plugin's — cheap to check) or an admin clicks "Check
-	 * Again" on the Plugins page, so a fresh release is reflected
-	 * immediately rather than waiting out the cache window.
+	 * Drops the cached release data once any plugin update actually runs
+	 * (cheap to check regardless of which plugin), so a fresh release is
+	 * reflected immediately rather than waiting out the cache window.
 	 */
-	public function purge_cache( $upgrader = null, $options = array() ) {
-		if ( null === $upgrader || ( isset( $options['action'], $options['type'] ) && 'update' === $options['action'] && 'plugin' === $options['type'] ) ) {
+	public function purge_cache_after_update( $upgrader, $options ) {
+		if ( isset( $options['action'], $options['type'] ) && 'update' === $options['action'] && 'plugin' === $options['type'] ) {
 			delete_transient( self::CACHE_KEY );
 		}
+	}
+
+	/**
+	 * Drops the cached release data whenever WordPress's own update_plugins
+	 * transient is deleted — e.g. an admin clicking "Check Again" on the
+	 * Updates page. WordPress passes the transient name itself as the
+	 * first argument to delete_site_transient_{$transient} (never null),
+	 * so this can't share a signature with purge_cache_after_update()
+	 * above — a shared method that checked for a null first argument would
+	 * never actually run when called from here, silently leaving the
+	 * 6-hour GitHub response cache in place no matter how many times
+	 * "Check Again" is clicked.
+	 */
+	public function purge_cache() {
+		delete_transient( self::CACHE_KEY );
 	}
 }

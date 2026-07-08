@@ -27,7 +27,7 @@ class NS_Admin_Page {
 			'manage_options',
 			self::MENU_SLUG,
 			array( $this, 'render_page' ),
-			'dashicons-shield',
+			$this->menu_icon(),
 			80
 		);
 
@@ -43,6 +43,17 @@ class NS_Admin_Page {
 			self::MENU_SLUG,
 			array( $this, 'render_page' )
 		);
+	}
+
+	/**
+	 * The Numeris "N" mark as a base64 SVG data URI, so WordPress applies
+	 * the same automatic dim/brighten-on-hover treatment it gives
+	 * dashicons — that only kicks in for icon_url values it recognises as
+	 * inline SVG data, not a plain image URL.
+	 */
+	private function menu_icon() {
+		$svg = file_get_contents( NS_DIR . 'admin/assets/numeris-mark-white.svg' );
+		return 'data:image/svg+xml;base64,' . base64_encode( $svg );
 	}
 
 	public function enqueue_assets( $hook ) {
@@ -72,7 +83,12 @@ class NS_Admin_Page {
 		?>
 		<div class="wrap ns-wrap">
 			<div class="ns-header">
-				<span class="dashicons dashicons-shield ns-header-icon"></span>
+				<div class="ns-header-logo">
+					<svg width="16" height="20" viewBox="0 0 70 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M0 86H14V26.5L59.5 86H69.5V78.5L9.5 0H0V86Z" fill="white"></path>
+						<path d="M69.5 0H55.5V44L69.5 62.5V0Z" fill="white"></path>
+					</svg>
+				</div>
 				<h1><?php esc_html_e( 'Numeris Shield', 'numeris-shield' ); ?></h1>
 			</div>
 
